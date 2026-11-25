@@ -441,5 +441,5 @@ def load_from_local(
     filename = osp.expanduser(filename)
     if not osp.isfile(filename):
         raise FileNotFoundError(f'{filename} can not be found.')
-    checkpoint = torch.load(filename, map_location=map_location, weights_only=False)
+    checkpoint = torch.load(filename, map_location=map_location, weights_only=False, mmap=True)
     return checkpoint
