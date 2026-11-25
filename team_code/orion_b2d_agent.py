@@ -53,6 +53,7 @@ class OrionAgent(autonomous_agent.AutonomousAgent):
         if IS_BENCH2DRIVE:
             self.save_name = path_to_conf_file.split('+')[-1]
         else:
+            now = datetime.datetime.now()
             self.save_name = '_'.join(map(lambda x: '%02d' % x, (now.month, now.day, now.hour, now.minute, now.second)))
         self.step = -1
         self.wall_start = time.time()
@@ -268,7 +269,7 @@ class OrionAgent(autonomous_agent.AutonomousAgent):
                     'id': 'SPEED'
                 },       
             ]
-        if IS_BENCH2DRIVE:
+        if SAVE_PATH is not None:
             sensors += [
                     {	
                         'type': 'sensor.camera.rgb',
@@ -295,7 +296,7 @@ class OrionAgent(autonomous_agent.AutonomousAgent):
         # cv2.imwrite('./work_dirs/tick_input_img.jpg', img)
         # bev = cv2.cvtColor(input_data['bev'][1][:, :, :3], cv2.COLOR_BGR2RGB)
 
-        bev = input_data['bev'][1][:, :, :3]
+        bev = input_data['bev'][1][:, :, :3] if 'bev' in input_data else None
         gps = input_data['GPS'][1][:2]
         speed = input_data['SPEED'][1]['speed']
         compass = input_data['IMU'][1][-1]

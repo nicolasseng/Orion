@@ -10,6 +10,11 @@ from torch.utils.cpp_extension import BuildExtension, CppExtension, CUDAExtensio
 EXT_TYPE = 'pytorch'
 cmd_class = {'build_ext': BuildExtension}
 
+
+def with_cuda():
+    # `docker build` has no GPU access -> set FORCE_CUDA=1 to still compile the CUDA ops
+    return torch.cuda.is_available() or os.getenv('FORCE_CUDA', '0') == '1'
+
 def make_cuda_ext(name,
                   module,
                   sources,
@@ -20,7 +25,7 @@ def make_cuda_ext(name,
     define_macros = []
     extra_compile_args = {'cxx': [] + extra_args}
 
-    if torch.cuda.is_available():
+    if with_cuda():
         define_macros += [('WITH_CUDA', None)]
         extension = CUDAExtension
         extra_compile_args['nvcc'] = extra_args + [
@@ -144,7 +149,7 @@ def get_extensions():
 
         include_dirs = []
 
-        if torch.cuda.is_available():
+        if with_cuda():
             define_macros += [('MMCV_WITH_CUDA', None)]
             cuda_args = os.getenv('MMCV_CUDA_ARGS')
             extra_compile_args['nvcc'] = [cuda_args] if cuda_args else []
